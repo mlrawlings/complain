@@ -1,6 +1,6 @@
 # complain
 
-Mark methods as deprecated and warn the user when they're called.
+Mark methods as deprecated and warn the user when they're called. Forked from [brianc/node-deprecate](https://github.com/brianc/node-deprecate).
 
 ## api
 

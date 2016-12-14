@@ -1,25 +1,23 @@
-# deprecate
+# complain
 
-[![Build Status](https://secure.travis-ci.org/brianc/node-deprecate.png?branch=master)](http://travis-ci.org/brianc/node-deprecate)
-
-Mark a method as deprecated.  Write a message to a stream once for each location in an application the deprecated method is called.
+Mark methods as deprecated and warn the user when they're called.
 
 ## api
 
-`var deprecate = require('deprecate');`
+`var complain = require('complain');`
 
-### deprecate()
+### complain()
 <sup>
-`deprecate([String message1 [, String message2 [,...]]], [Object options])`
+`complain([String message1 [, String message2 [,...]]], [Object options])`
 </sup>
 
-Call `deprecate` within a function you are deprecating.  It will spit out all the messages to the console the first time _and only the first time_ the method is called.
+Call `complain` within a function you are deprecating.  It will spit out all the messages to the console the first time _and only the first time_ the method is called.
 
 ```js
-1  │ var deprecate = require('deprecate');
+1  │ var complain = require('complain');
 2  │
 3  │ var someDeprecatedFunction = function() {
-4  │   deprecate('someDeprecatedFunction() is deprecated');
+4  │   complain('someDeprecatedFunction() is deprecated');
 5  │ };
 6  │
 …  │ // …
@@ -33,36 +31,36 @@ _program output:_
 
 #### Options
 
-**`location`**: a string in the format `${filepath}:${line}:${column}` indicating where the deprecated function was called from.  _TODO: `false` disables outputting the location and will only log the message once._
+**`location`**: a string in the format `${filepath}:${line}:${column}` indicating where the deprecated function was called from.  Setting this to `false` disables outputting the location and will only log the message once.
 
-### deprecate.method()
+### complain.method()
 <sup>
-`deprecate.method(Object proto, String methodName, [String message1 [, String message2 [,...]]], [Object options])`
+`complain.method(Object proto, String methodName, [String message1 [, String message2 [,...]]], [Object options])`
 </sup>
 
 Deprecates a method on an object:
 
 ```js
-deprecate.method(console, 'log', 'You should not log.');
+complain.method(console, 'log', 'You should not log.');
 ```
 
-### deprecate.fn()
+### complain.fn()
 <sup>
-`deprecate.fn(Function func, [String message1 [, String message2 [,...]]], [Object options])`
+`complain.fn(Function func, [String message1 [, String message2 [,...]]], [Object options])`
 </sup>
 
 Deprecates a function and returns it:
 
 ```js
-console.log = deprecate.fn(console.log, 'You should not log.');
+console.log = complain.fn(console.log, 'You should not log.');
 ```
 
-### deprecate.color
+### complain.color
 
-Set to `false` to disable color output.  Set to `true` to force color output.  Defaults to the value of `deprecate.stream.isTTY`.
+Set to `false` to disable color output.  Set to `true` to force color output.  Defaults to the value of `complain.stream.isTTY`.
 
 
-### deprecate.colors
+### complain.colors
 
 Controls the colors used when logging. Default value:
 ```js
@@ -77,17 +75,17 @@ _How the default looks on a dark background vs. a light background:_
 
 <img width="373" src="https://cloud.githubusercontent.com/assets/1958812/20812831/f2a1cde0-b7c7-11e6-93e6-1613e028e719.png"><img width="344" src="https://cloud.githubusercontent.com/assets/1958812/20812832/f2a1edb6-b7c7-11e6-81f5-73319ae5f968.png">
 
-### deprecate.silence
+### complain.silence
 
-When `true`, do nothing when the deprecate method is called.
+When `true`, do nothing when the complain method is called.
 
-### deprecate.stream
+### complain.stream
 
 The to which output is written.  Defaults to `process.stderr`.
 
-### deprecate.log(message)
+### complain.log(message)
 
-The function used to log, by default this function writes to `deprecate.stream` and falls back to `console.warn`.
+The function used to log, by default this function writes to `complain.stream` and falls back to `console.warn`.
 
 You can replace this with your own logging method.
 

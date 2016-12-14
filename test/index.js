@@ -1,9 +1,9 @@
 var assert = require('assert');
 
-var deprecate = require(__dirname + '/../');
+var complain = require(__dirname + '/../');
 
 function someDeprecatedMethod() {
-  deprecate('someDeprecatedMethod() is deprecated');
+  complain('someDeprecatedMethod() is deprecated');
 }
 
 function callsSomeDeprecatedMethod() {
@@ -20,10 +20,10 @@ var output = {
   }
 }
 
-describe('deprecate', function() {
+describe('complain', function() {
   beforeEach(function() {
     output._clear();
-    deprecate.stream = output;
+    complain.stream = output;
   });
 
   it('prints the correct location', function() {
@@ -37,25 +37,25 @@ describe('deprecate', function() {
   });
 
   it('does nothing if silence is turned on', function() {
-    deprecate.silence = true;
-    deprecate('this method is deprecated and will be removed');
+    complain.silence = true;
+    complain('this method is deprecated and will be removed');
     assert.equal(output._text.length, 0);
   });
 
   it('prints to output if silence is turned off', function() {
-    deprecate.silence = false;
-    deprecate('line1', 'line2', 'line3');
+    complain.silence = false;
+    complain('line1', 'line2', 'line3');
     var text = output._text.join(' ');
     assert(text.indexOf('WARNING') > 0, 'should have contained the string "warning"');
     assert(text.indexOf('line1') > 0, 'should have contained the string "line1"');
     assert(text.indexOf('line2') > 0, 'should have contained the string "line2"');
     assert(text.indexOf('line2') > text.indexOf('line1'), 'line 2 should come after line 1');
-    assert(text.indexOf(deprecate.colors.warning) > 0, 'should have color');
+    assert(text.indexOf(complain.colors.warning) > 0, 'should have color');
   });
 
   it('allows location to be turned off and then only prints once per call', function() {
     function foo() {
-      deprecate('foo is deprecated', { location:false });
+      complain('foo is deprecated', { location:false });
     }
 
     assert.equal(output._text.length, 0);
@@ -73,10 +73,10 @@ describe('deprecate', function() {
   })
 
   it('does not print color if color turned off', function() {
-    deprecate.color = false;
-    deprecate('test');
+    complain.color = false;
+    complain('test');
     var text = output._text.join(' ');
-    assert.equal(text.indexOf(deprecate.color), -1, 'should not have color string');
+    assert.equal(text.indexOf(complain.color), -1, 'should not have color string');
     assert.equal(text.indexOf('\x1b[0m'), -1, 'should not have reset color char ');
   });
 
@@ -106,7 +106,7 @@ describe('deprecate', function() {
     Test.prototype.foo = function(a, b, c) {
       called = { a:a, b:b, c:c };
     };
-    deprecate.method(Test.prototype, 'foo', 'Don\'t call foo');
+    complain.method(Test.prototype, 'foo', 'Don\'t call foo');
 
     var test = new Test();
     test.foo(1, 2, 3);
@@ -121,7 +121,7 @@ describe('deprecate', function() {
   it('can wrap a function', function() {
     var called;
 
-    var foo = deprecate.fn(function foo(a, b, c) {
+    var foo = complain.fn(function foo(a, b, c) {
       called = { a:a, b:b, c:c };
     }, 'Don\'t call foo');
 

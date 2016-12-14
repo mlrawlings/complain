@@ -1,5 +1,5 @@
 {
-  "name": "deprecate",
+  "name": "complain",
   "version": "1.0.0",
   "description": "Mark methods as deprecated and warn the user when they're called",
   "main": "index.js",
@@ -8,12 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/brianc/node-deprecate.git"
+    "url": "git://github.com/mlrawlings/complain.git"
   },
   "keywords": [
-    "deprecate"
+    "deprecate",
+    "complain"
   ],
-  "author": "Brian M. Carlson",
+  "author": "Michael Rawlings",
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.8.1"

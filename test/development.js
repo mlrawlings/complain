@@ -1,6 +1,7 @@
 var assert = require('assert');
 
-var complain = require(__dirname + '/../');
+delete require.cache[require.resolve('..')];
+var complain = require('..');
 
 function someDeprecatedMethod() {
   complain('someDeprecatedMethod() is deprecated');
@@ -20,7 +21,7 @@ var output = {
   }
 }
 
-describe('complain', function() {
+describe('complain development', function() {
   beforeEach(function() {
     output._clear();
     complain.stream = output;
@@ -32,8 +33,8 @@ describe('complain', function() {
 
     // IF THIS TEST IS FAILING, CHECK THAT THE LINES MATCH THE TWO CALLS ABOVE!
     var text = output._text.join(' ');
-    assert(text.indexOf('test/index.js:30:5') > 0, 'should have first location');
-    assert(text.indexOf('test/index.js:31:5') > 0, 'should have second location');
+    assert(text.indexOf('test/development.js:31:5') > 0, 'should have first location');
+    assert(text.indexOf('test/development.js:32:5') > 0, 'should have second location');
   });
 
   it('does nothing if silence is turned on', function() {
@@ -132,6 +133,27 @@ describe('complain', function() {
     assert(called.a === 1, 'should have passed the arguments to the function');
     assert(called.b === 2, 'should have passed the arguments to the function');
     assert(called.c === 3, 'should have passed the arguments to the function');
+  });
+
+  it('logs a warning to console without custom stream', function(done) {
+    var warn = console.warn;
+    console.warn = function () {
+      done();
+    }
+
+    complain.stream = undefined;
+    complain('fail');
+    console.warn = warn;
+  });
+
+  it('does nothing when missing console and stream', function() {
+    var warn = console.warn;
+    console.warn = undefined
+    delete require.cache[require.resolve('..')];
+    var complain = require('..');
+    complain.stream = undefined;
+    complain.log('fail');
+    console.warn = warn;
   });
 
 });

@@ -4,7 +4,8 @@
   "description": "Mark methods as deprecated and warn the user when they're called",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "nyc --include=index.js --reporter=lcov --reporter=text-summary mocha",
+    "test-ci": "nyc --include=index.js --reporter=lcovonly --reporter=text mocha"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,10 @@
   "author": "Michael Rawlings",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "~1.8.1"
+    "mocha": "^4.0.1",
+    "nyc": "^11.2.1"
+  },
+  "dependencies": {
+    "error-stack-parser": "^2.0.1"
   }
 }

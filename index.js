@@ -1,9 +1,11 @@
+'use strict';
+
+var StackParser = require('error-stack-parser');
 var env = typeof process !== 'undefined' && process.env.NODE_ENV;
-var isWindows = typeof process !== 'undefined' && 'win32' === process.platform;
 var isDevelopment = !env || env === 'dev' || env === 'development';
 var logger = typeof console !== 'undefined' && console.warn && console;
 var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
-var linebreak = isWindows ? '\r\n' : '\n';
+var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
 var newline = /(\r\n|\r|\n)/g;
 var slice = [].slice;
 var hits = {};
@@ -17,6 +19,7 @@ complain.silence = false;
 complain.color = complain.stream && complain.stream.isTTY;
 complain.colors = { warning:'\x1b[31;1m', message:false, location:'\u001b[90m' };
 
+/* istanbul ignore next */
 if(typeof module !== 'undefined' && module.exports) {
   module.exports = complain;
 } else if(typeof window !== 'undefined') {
@@ -48,8 +51,12 @@ function complain() {
 
   location = options.location || getLocation(getCallToDeprecate);
 
-  if(hits[location || complain.caller]) return;
-  else hits[location || complain.caller] = true;
+  /* istanbul ignore next */
+  // Location is only missing in older browsers.
+  if(location) {
+    if(hits[location]) return;
+    else hits[location] = true;
+  }
 
   var output = format('WARNING!!', complain.colors.warning);
 
@@ -100,43 +107,24 @@ function getLocation(getCallToDeprecate) {
   var stack;
   var frame;
   var location = '';
-  var index = getCallToDeprecate ? 3 : 4;
+  var index = getCallToDeprecate ? 2 : 3;
 
-  /*
-    0: In getRawStack(), the call to new Error()
-    1: In getLocation(), the call to getRawStack()
-    2: In complain(), the call to getLocation()
-    3: In the deprecated function, the call to complain()
-    4: The call to the deprecated function (THIS IS THE DEFAULT)
-  */
+  /**
+   * Stack index descriptions.
+   * 
+   * 0: In getLocation(), the call to new Error()
+   * 1: In complain(), the call to getLocation()
+   * 2: In the deprecated function, the call to complain()
+   * 3: The call to the deprecated function (THIS IS THE DEFAULT)
+   */
 
   try {
-    stack = getRawStack();
-    frame = stack[index] || stack[3];
-    location = frame.getFileName()+':'+frame.getLineNumber()+':'+frame.getColumnNumber();
+    stack = StackParser.parse(new Error());
+    frame = stack[index];
+    location = frame.fileName+':'+frame.lineNumber+':'+frame.columnNumber;
   } catch(e) {}
 
   return location;
-}
-
-function getRawStack() {
-  var stack;
-  var restore = patch(Error, 'prepareStackTrace', returnStack);
-  stack = new Error().stack;
-  restore();
-  return stack;
-}
-
-function patch(object, method, replacement) {
-  var original = object[method];
-  object[method] = replacement;
-  return function restore() {
-    object[method] = original;
-  }
-}
-
-function returnStack(_, stack) {
-  return stack;
 }
 
 function noop(){};

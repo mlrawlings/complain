@@ -89,6 +89,12 @@ The function used to log, by default this function writes to `complain.stream` a
 
 You can replace this with your own logging method.
 
+### complain.getModuleName(location)
+
+The function that determines if a complaint is coming from a `node_module`.  If the location for a complaint is inside a dependent module, a single generic warning is logged once per module.  You can replace this with your own function for environments (like browsers) that might not have `node_modules` in the path.
+
+> Run with the enviornment variable SHOW_MODULE_COMPLAINS=1 to disable the generic module warning
+
 ## license
 
 MIT

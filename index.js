@@ -3,6 +3,7 @@
 var StackParser = require('error-stack-parser');
 var env = typeof process !== 'undefined' && process.env.NODE_ENV;
 var isDevelopment = !env || env === 'dev' || env === 'development';
+var showModuleComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_MODULE_COMPLAINS);
 var logger = typeof console !== 'undefined' && console.warn && console;
 var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
 var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
@@ -18,9 +19,10 @@ complain.stream = typeof process !== 'undefined' && process.stderr;
 complain.silence = false;
 complain.color = complain.stream && complain.stream.isTTY;
 complain.colors = { warning:'\x1b[31;1m', message:false, location:'\u001b[90m' };
+complain.getModuleName = getModuleName;
 
 /* istanbul ignore next */
-if(typeof module !== 'undefined' && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   module.exports = complain;
 } else if(typeof window !== 'undefined') {
   window.complain = complain;
@@ -50,6 +52,19 @@ function complain() {
   }
 
   location = options.location || getLocation(getCallToDeprecate);
+  
+  var moduleName = complain.getModuleName(location);
+
+  if (moduleName && !showModuleComplains) {
+    if (!hits[moduleName]) {
+      var output = format('WARNING!!', complain.colors.warning) 
+      output += linebreak + format('The module ['+moduleName+'] is using deprecated features.', complain.colors.message);
+      output += linebreak + format('Run with process.env.SHOW_MODULE_COMPLAINS=1 to see all warnings.', complain.colors.message);
+      complain.log(linebreak + output + linebreak);
+      hits[moduleName] = true;
+    }
+    return;
+  }
 
   /* istanbul ignore next */
   // Location is only missing in older browsers.
@@ -125,6 +140,16 @@ function getLocation(getCallToDeprecate) {
   } catch(e) {}
 
   return location;
+}
+
+function getModuleName(location) {
+  var locationParts = location.replace(cwd, '').split(/\/|\\/g);
+  for(var i = locationParts.length-1; i >= 0; i--) {
+    if (locationParts[i] === 'node_modules') {
+      var moduleName = locationParts[i+1];
+      return (moduleName[0] === '@') ? moduleName+'/'+locationParts[i+2] : moduleName;
+    }
+  }
 }
 
 function noop(){};

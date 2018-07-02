@@ -2,6 +2,7 @@ var assert = require('assert');
 
 delete require.cache[require.resolve('..')];
 var complain = require('..');
+var moduleWithComplains = require('module-with-complains');
 
 function someDeprecatedMethod() {
   complain('someDeprecatedMethod() is deprecated');
@@ -33,8 +34,8 @@ describe('complain development', function() {
 
     // IF THIS TEST IS FAILING, CHECK THAT THE LINES MATCH THE TWO CALLS ABOVE!
     var text = output._text.join(' ');
-    assert(text.indexOf('test/development.js:31:5') > 0, 'should have first location');
-    assert(text.indexOf('test/development.js:32:5') > 0, 'should have second location');
+    assert(text.indexOf('test/development.js:32:5') > 0, 'should have first location');
+    assert(text.indexOf('test/development.js:33:5') > 0, 'should have second location');
   });
 
   it('does nothing if silence is turned on', function() {
@@ -45,13 +46,24 @@ describe('complain development', function() {
 
   it('prints to output if silence is turned off', function() {
     complain.silence = false;
-    complain('line1', 'line2', 'line3');
+    complain('line1', 'line2', 'line3', { location:false });
     var text = output._text.join(' ');
     assert(text.indexOf('WARNING') > 0, 'should have contained the string "warning"');
     assert(text.indexOf('line1') > 0, 'should have contained the string "line1"');
     assert(text.indexOf('line2') > 0, 'should have contained the string "line2"');
     assert(text.indexOf('line2') > text.indexOf('line1'), 'line 2 should come after line 1');
     assert(text.indexOf(complain.colors.warning) > 0, 'should have color');
+  });
+
+
+  it('shows single generic warning if the complain comes from a node_module', function() {
+    moduleWithComplains.one();
+    var text = output._text.join(' ');
+    console.log(text);
+    assert(text.indexOf('WARNING') > 0, 'should have contained the string "warning"');
+    assert(text.indexOf('module-with-complains') > 0, 'should contain the module name');
+    moduleWithComplains.two();
+    assert(text === output._text.join(' '), 'should not log more than once per module');
   });
 
   it('allows location to be turned off and then only prints once per call', function() {
@@ -142,7 +154,7 @@ describe('complain development', function() {
     }
 
     complain.stream = undefined;
-    complain('fail');
+    complain('fail', { location:false });
     console.warn = warn;
   });
 

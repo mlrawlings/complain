@@ -18,8 +18,8 @@
   "author": "Michael Rawlings",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^4.0.1",
-    "nyc": "^11.2.1"
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1"
   },
   "dependencies": {
     "error-stack-parser": "^2.0.1"

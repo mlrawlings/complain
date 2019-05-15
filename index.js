@@ -4,6 +4,7 @@ var StackParser = require('error-stack-parser');
 var env = typeof process !== 'undefined' && process.env.NODE_ENV;
 var isDevelopment = !env || env === 'dev' || env === 'development';
 var showModuleComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_MODULE_COMPLAINS);
+var showNestedComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_NESTED_COMPLAINS);
 var logger = typeof console !== 'undefined' && console.warn && console;
 var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
 var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
@@ -136,9 +137,11 @@ function getLocation(getCallToDeprecate) {
     var locations = StackParser.parse(new Error()).map(function(frame) {
       return frame.fileName+':'+frame.lineNumber+':'+frame.columnNumber;
     });
-    for (var i = locations.length-1; i > targetIndex; i--) {
-      if (hits[locations[i]]) {
-        return ignoredLocation;
+    if (!showNestedComplains) {
+      for (var i = locations.length-1; i > targetIndex; i--) {
+        if (hits[locations[i]]) {
+          return ignoredLocation;
+        }
       }
     }
     location = locations[targetIndex];

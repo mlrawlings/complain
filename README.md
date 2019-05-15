@@ -91,9 +91,25 @@ You can replace this with your own logging method.
 
 ### complain.getModuleName(location)
 
-The function that determines if a complaint is coming from a `node_module`.  If the location for a complaint is inside a dependent module, a single generic warning is logged once per module.  You can replace this with your own function for environments (like browsers) that might not have `node_modules` in the path.
+The function that determines if a warning is coming from a `node_module`.  If the location for a warning is inside a dependent module, a single generic warning is logged once per module.  You can replace this with your own function for environments (like browsers) that might not have `node_modules` in the path.
 
-> Run with the enviornment variable SHOW_MODULE_COMPLAINS=1 to disable the generic module warning
+## environment variables
+
+### `SHOW_MODULE_COMPLAINS`
+
+By default, deprecation warnings whose caller location is in a dependent module will not be logged.  A single module-level warning will be logged per module that is using deprecated apis.  If you wish to view the individual warnings, set this variable to a truthy value.
+
+```
+SHOW_MODULE_COMPLAINS=1 node app.js
+```
+
+### `SHOW_NESTED_COMPLAINS`
+
+By default, if a deprecated function is using other deprecated apis, there will only be a warning for the top-level call to the deprecated function.  If you wish to view the nested warnings, set this variable to a truthy value.
+
+```
+SHOW_NESTED_COMPLAINS=1 node app.js
+```
 
 ## license
 

@@ -9,6 +9,7 @@ var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
 var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
 var newline = /(\r\n|\r|\n)/g;
 var slice = [].slice;
+var ignoredLocation = "[ignore]";
 var hits = {};
 
 complain = isDevelopment ? complain : noop;
@@ -69,7 +70,7 @@ function complain() {
   /* istanbul ignore next */
   // Location is only missing in older browsers.
   if(location) {
-    if(hits[location]) return;
+    if(hits[location] || location === ignoredLocation) return;
     else hits[location] = true;
   }
 
@@ -119,10 +120,8 @@ function format(message, color) {
 }
 
 function getLocation(getCallToDeprecate) {
-  var stack;
-  var frame;
   var location = '';
-  var index = getCallToDeprecate ? 2 : 3;
+  var targetIndex = getCallToDeprecate ? 2 : 3;
 
   /**
    * Stack index descriptions.
@@ -134,9 +133,15 @@ function getLocation(getCallToDeprecate) {
    */
 
   try {
-    stack = StackParser.parse(new Error());
-    frame = stack[index];
-    location = frame.fileName+':'+frame.lineNumber+':'+frame.columnNumber;
+    var locations = StackParser.parse(new Error()).map(function(frame) {
+      return frame.fileName+':'+frame.lineNumber+':'+frame.columnNumber;
+    });
+    for (var i = locations.length-1; i > targetIndex; i--) {
+      if (hits[locations[i]]) {
+        return ignoredLocation;
+      }
+    }
+    location = locations[targetIndex];
   } catch(e) {}
 
   return location;

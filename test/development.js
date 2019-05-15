@@ -12,6 +12,11 @@ function callsSomeDeprecatedMethod() {
   someDeprecatedMethod()
 }
 
+function doubleDeprecated() {
+  complain('doubleDeprecated() is deprecated');
+  someDeprecatedMethod()
+}
+
 var output = {
   _text: [],
   _clear: function() {
@@ -34,8 +39,8 @@ describe('complain development', function() {
 
     // IF THIS TEST IS FAILING, CHECK THAT THE LINES MATCH THE TWO CALLS ABOVE!
     var text = output._text.join(' ');
-    assert(text.indexOf('test/development.js:32:5') > 0, 'should have first location');
-    assert(text.indexOf('test/development.js:33:5') > 0, 'should have second location');
+    assert(text.indexOf('test/development.js:37:5') > 0, 'should have first location');
+    assert(text.indexOf('test/development.js:38:5') > 0, 'should have second location');
   });
 
   it('does nothing if silence is turned on', function() {
@@ -168,4 +173,11 @@ describe('complain development', function() {
     console.warn = warn;
   });
 
+  it('only logs the top-level complain for a callstack', function() {
+    doubleDeprecated()
+
+    var text = output._text.join(' ');
+    assert(text.indexOf('doubleDeprecated') > 0, 'should have contained the string "doubleDeprecated"');
+    assert.equal(text.indexOf('someDeprecatedMethod'), -1, 'should not have contained the string "someDeprecatedMethod"');
+  });
 });

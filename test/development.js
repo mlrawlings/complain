@@ -43,6 +43,22 @@ describe('complain development', function() {
     assert(text.indexOf('test/development.js:38:5') > 0, 'should have second location');
   });
 
+  it('prints the correct custom location', function() {
+    function api() {
+      internal();
+    }
+
+    function internal() {
+      complain("test", { locationIndex:2 })
+    }
+
+    api();
+
+    // IF THIS TEST IS FAILING, CHECK THAT THE LINE MATCHES THE api() CALL ABOVE!
+    var text = output._text.join(' ');
+    assert(text.indexOf('test/development.js:55:5') > 0, 'should have api location');
+  });
+
   it('does nothing if silence is turned on', function() {
     complain.silence = true;
     complain('this method is deprecated and will be removed');

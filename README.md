@@ -32,6 +32,7 @@ _program output:_
 #### Options
 
 **`location`**: a string in the format `${filepath}:${line}:${column}` indicating where the deprecated function was called from.  Setting this to `false` disables outputting the location and will only log the message once.
+**`locationIndex`**: a number indicating the distance (in stack frames) from the call to complain to use as the deprecated location. 0 is the call to complain.  By default, it is 1, which is typically the call to the deprecated function.
 
 ### complain.method()
 <sup>

@@ -33,7 +33,7 @@ if (typeof module !== 'undefined' && module.exports) {
 function complain() {
   var options;
   var location;
-  var getCallToDeprecate;
+  var locationIndex;
   var args = arguments;
 
   if(complain.silence) return;
@@ -45,15 +45,17 @@ function complain() {
     options = {};
   }
 
+  // Default to the location of the call to the deprecated function
+  locationIndex = options.locationIndex == null ? 1 : options.locationIndex;
+
+  // When the user sets location to false,
+  // We will use the location of the call to complain()
+  // To limit the log to only occurring once
   if(options.location === false) {
-    // When the user explictly sets location to false,
-    // We will get the location of the call to complain()
-    // is called, instead of the location of the call to the
-    // deprecated function.
-    getCallToDeprecate = true;
+    locationIndex = 0;
   }
 
-  location = options.location || getLocation(getCallToDeprecate);
+  location = options.location || getLocation(locationIndex);
   
   var moduleName = complain.getModuleName(location);
 
@@ -120,9 +122,9 @@ function format(message, color) {
   return color && complain.color ? color + message + '\x1b[0m' : message;
 }
 
-function getLocation(getCallToDeprecate) {
+function getLocation(locationIndex) {
   var location = '';
-  var targetIndex = getCallToDeprecate ? 2 : 3;
+  var targetIndex = locationIndex + 2;
 
   /**
    * Stack index descriptions.

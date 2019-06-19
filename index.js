@@ -20,7 +20,7 @@ complain.log = log;
 complain.stream = typeof process !== 'undefined' && process.stderr;
 complain.silence = false;
 complain.color = complain.stream && complain.stream.isTTY;
-complain.colors = { warning:'\x1b[31;1m', message:false, location:'\u001b[90m' };
+complain.colors = { warning:'\x1b[31;1m', notice:'\x1b[33;1m', message:false, location:'\u001b[90m' };
 complain.getModuleName = getModuleName;
 
 /* istanbul ignore next */
@@ -34,6 +34,9 @@ function complain() {
   var options;
   var location;
   var locationIndex;
+  var headingColor;
+  var heading;
+  var level;
   var args = arguments;
 
   if(complain.silence) return;
@@ -44,6 +47,10 @@ function complain() {
   } else {
     options = {};
   }
+
+  level = options.level || 2;
+  heading = options.heading || (level == 2 ? "WARNING!!" : "NOTICE");
+  headingColor = options.headingColor || (level == 2 ? complain.colors.warning : complain.colors.notice);
 
   // Default to the location of the call to the deprecated function
   locationIndex = options.locationIndex == null ? 1 : options.locationIndex;
@@ -61,7 +68,7 @@ function complain() {
 
   if (moduleName && !showModuleComplains) {
     if (!hits[moduleName]) {
-      var output = format('WARNING!!', complain.colors.warning) 
+      var output = format("NOTICE", complain.colors.notice);
       output += linebreak + format('The module ['+moduleName+'] is using deprecated features.', complain.colors.message);
       output += linebreak + format('Run with process.env.SHOW_MODULE_COMPLAINS=1 to see all warnings.', complain.colors.message);
       complain.log(linebreak + output + linebreak);
@@ -77,7 +84,7 @@ function complain() {
     else hits[location] = true;
   }
 
-  var output = format('WARNING!!', complain.colors.warning);
+  var output = format(heading, headingColor);
 
   for(var i = 0; i < args.length; i++) {
     output += linebreak + format(args[i], complain.colors.message);

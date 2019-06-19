@@ -31,8 +31,11 @@ _program output:_
 
 #### Options
 
-**`location`**: a string in the format `${filepath}:${line}:${column}` indicating where the deprecated function was called from.  Setting this to `false` disables outputting the location and will only log the message once.
-**`locationIndex`**: a number indicating the distance (in stack frames) from the call to complain to use as the deprecated location. 0 is the call to complain.  By default, it is 1, which is typically the call to the deprecated function.
+- **`location`**: a string in the format `${filepath}:${line}:${column}` indicating where the deprecated function was called from.  Setting this to `false` disables outputting the location and will only log the message once.
+- **`locationIndex`**: a number indicating the distance (in stack frames) from the call to complain to use as the deprecated location. 0 is the call to complain.  By default, it is 1, which is typically the call to the deprecated function.
+- **`level`**: a number indicating the log level. 1 = notice. 2 = warning (default).
+- **`heading`**: a string that will be printed in color above the message. By default, "WARNING" when `level === 2` or "NOTICE" when `level === 1`.
+- **`headingColor`**: a string that is an ansi color/format. By default, `colors.warning` when `level === 2` or `colors.notice` when `level === 1`.
 
 ### complain.method()
 <sup>
@@ -67,6 +70,7 @@ Controls the colors used when logging. Default value:
 ```js
 {
   warning: '\x1b[31;1m', // red, bold
+  notice: '\x1b[33;1m', // yellow, bold
   message: false, // use system color
   location: '\u001b[90m' // gray
 }

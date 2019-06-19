@@ -76,12 +76,24 @@ describe('complain development', function() {
     assert(text.indexOf(complain.colors.warning) > 0, 'should have color');
   });
 
+  it('allows a lower log level', function() {
+    complain('this is a less urgent message', { level:1, locationIndex:0 });
+    var text = output._text.join(' ');
+    assert(text.indexOf('NOTICE') > 0, 'should have contained the string "notice"');
+    assert(text.indexOf('this is a less urgent message') > 0, 'should have contained the message');
+  });
 
-  it('shows single generic warning if the complain comes from a node_module', function() {
+  it('allows custom header', function() {
+    complain('this is a migratable deprecation', { heading:'MIGRATE', headingColor:'\x1b[36;1m', locationIndex:0 });
+    var text = output._text.join(' ');
+    assert(text.indexOf('MIGRATE') > 0, 'should have contained the string "migrate"');
+    assert(text.indexOf('this is a migratable deprecation') > 0, 'should have contained the message');
+  });
+
+  it('shows single generic notice if the complain comes from a node_module', function() {
     moduleWithComplains.one();
     var text = output._text.join(' ');
-    console.log(text);
-    assert(text.indexOf('WARNING') > 0, 'should have contained the string "warning"');
+    assert(text.indexOf('NOTICE') > 0, 'should have contained the string "notice"');
     assert(text.indexOf('module-with-complains') > 0, 'should contain the module name');
     moduleWithComplains.two();
     assert(text === output._text.join(' '), 'should not log more than once per module');

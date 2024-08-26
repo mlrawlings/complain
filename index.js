@@ -6,7 +6,7 @@ var isDevelopment = !env || env === 'dev' || env === 'development';
 var showModuleComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_MODULE_COMPLAINS);
 var showNestedComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_NESTED_COMPLAINS);
 var logger = typeof console !== 'undefined' && console.warn && console;
-var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
+var cwd = typeof process !== 'undefined' && process.cwd && process.cwd() + '/' || '';
 var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
 var newline = /(\r\n|\r|\n)/g;
 var slice = [].slice;
